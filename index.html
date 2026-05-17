@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>MS Shops | AI Enhanced Firebase Platform</title>
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: radial-gradient(circle at 20% 30%, #0a0f1f, #01030a); color: #f0f3fa; overflow-x: hidden; }
+        .glass-card { background: rgba(12, 20, 35, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.08); border-radius: 2rem; transition: all 0.3s ease; }
+        .glass-card:hover { border-color: #0ea5e9; transform: translateY(-2px); box-shadow: 0 20px 32px -12px rgba(14,165,233,0.2); }
+        .btn-primary { background: linear-gradient(115deg, #0ea5e9, #c084fc); border-radius: 3rem; font-weight: 700; transition: 0.2s; box-shadow: 0 5px 16px -4px #0ea5e9; }
+        .btn-primary:hover { transform: scale(1.02); filter: brightness(1.08); }
+        .input-glow { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); border-radius: 2rem; padding: 0.8rem 1.4rem; width: 100%; color: white; outline: none; transition: 0.2s; }
+        .input-glow:focus { border-color: #0ea5e9; box-shadow: 0 0 0 3px rgba(14,165,233,0.2); }
+        .fade-up { animation: rise 0.5s ease-out; }
+        @keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .toast-msg { position: fixed; bottom: 90px; right: 20px; background: #0f172ad9; backdrop-filter: blur(12px); border-left: 4px solid #0ea5e9; padding: 8px 16px; border-radius: 40px; z-index: 9999; font-weight: 500; font-size: 13px; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0f1222; }
+        ::-webkit-scrollbar-thumb { background: #0ea5e9; border-radius: 20px; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(2, 6, 23, 0.96); backdrop-filter: blur(20px); border-top: 1px solid rgba(14,165,233,0.5); display: flex; justify-content: space-around; align-items: center; padding: 12px 8px; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: #94a3b8; transition: 0.2s; cursor: pointer; padding: 6px 10px; border-radius: 28px; }
+        .nav-item.active { color: #0ea5e9; background: rgba(14,165,233,0.2); }
+        .nav-item i { width: 24px; height: 24px; stroke-width: 2px; }
+        .more-menu { position: fixed; bottom: 80px; right: 15px; background: rgba(10, 15, 30, 0.98); backdrop-filter: blur(20px); border: 1px solid #0ea5e9; border-radius: 28px; padding: 12px; width: 280px; z-index: 110; display: none; flex-direction: column; gap: 8px; box-shadow: 0 20px 35px -10px black; max-height: 70vh; overflow-y: auto; }
+        .more-menu .more-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 40px; font-size: 13px; font-weight: 600; transition: 0.2s; cursor: pointer; color: #cbd5e1; }
+        .more-menu .more-item:hover { background: rgba(14,165,233,0.2); color: white; }
+        .more-menu .more-item i { width: 18px; height: 18px; }
+        .search-container { margin-bottom: 20px; position: relative; }
+        .search-input { background: rgba(255,255,255,0.07); border: 1px solid rgba(14,165,233,0.4); border-radius: 3rem; padding: 12px 20px 12px 48px; width: 100%; color: white; font-size: 15px; outline: none; transition: 0.2s; }
+        .search-input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 3px rgba(14,165,233,0.2); }
+        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: #0ea5e9; }
+        .clear-search { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; font-size: 18px; font-weight: bold; padding: 4px; }
+        .other-cat-input { margin-top: 8px; display: none; }
+        .admin-badge { background: linear-gradient(135deg, #f97316, #ef4444); font-size: 10px; padding: 2px 8px; border-radius: 30px; margin-left: 8px; }
+        .banned-tag { background: #ef4444; font-size: 10px; padding: 2px 6px; border-radius: 20px; margin-left: 8px; }
+        .shop-vertical-list { display: flex; flex-direction: column; gap: 1.5rem; }
+        .shop-vertical-list .shop-card { width: 100%; }
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid white; border-radius: 50%; border-top-color: #0ea5e9; animation: spin 0.6s linear infinite; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="max-w-4xl mx-auto px-5 py-6 pb-32">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="switchView('home')">
+            <div class="w-10 h-10 btn-primary rounded-2xl flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5"></i></div>
+            <h1 class="text-2xl font-black tracking-tight"><span class="text-sky-400">MS</span> Shops</h1>
+        </div>
+        <div class="flex gap-3">
+            <div id="authBadge"><button onclick="openLoginModal()" id="loginBtnMain" class="btn-primary px-5 py-2 text-sm">Login</button></div>
+            <div id="userMenu" class="hidden items-center gap-2"><span id="userNameDisplay" class="text-sm font-bold"></span><button onclick="logoutUser()" class="text-rose-400 text-xs">Exit</button></div>
+        </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-container">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" id="globalSearchInput" class="search-input" placeholder="🔍 Search shops by name, item, category, district or town...">
+        <span id="clearSearchBtn" class="clear-search" onclick="clearGlobalSearch()" style="display: none;">✕</span>
+    </div>
+
+    <!-- VIEWS -->
+    <div id="viewContainer" class="space-y-8">
+        <div id="homeView" class="fade-up">
+            <div class="grid md:grid-cols-2 gap-8 items-center mb-12">
+                <div><div class="flex gap-2 mb-2"><div class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></div><span class="text-[10px] font-black text-sky-400 tracking-widest">LIVE MARKET</span></div>
+                    <h2 class="text-5xl md:text-7xl font-black leading-tight">Find Local <span class="text-sky-400">Shops</span>.</h2>
+                    <p class="text-white/40 mt-4">Grocery, electronics, fashion, books & more. Real-time community driven.</p>
+                    <div class="flex gap-4 mt-6"><button onclick="switchView('near')" class="btn-primary px-7 py-3 text-sm">📍 Explore Near Me</button><button onclick="switchView('register')" class="glass-card px-7 py-3 font-bold text-sm">✨ Register Shop</button></div>
+                </div>
+                <div class="glass-card p-2 rotate-1 hover:rotate-0 transition"><img src="https://images.unsplash.com/photo-1556741533-6e6a3bd8e0d2?w=600" class="rounded-2xl" alt="market"></div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-14">
+                <div class="glass-card p-4 text-center"><div class="text-3xl font-black"><span id="statDistrictsCount">25</span></div><div class="text-[10px] uppercase text-sky-400">Districts</div></div>
+                <div class="glass-card p-4 text-center"><div class="text-3xl font-black"><span id="statTotalShops">0</span></div><div class="text-[10px] uppercase text-sky-400">Shops</div></div>
+                <div class="glass-card p-4 text-center"><div class="text-3xl font-black"><span id="statItemsCount">0</span></div><div class="text-[10px] uppercase text-sky-400">Items</div></div>
+                <div class="glass-card p-4 text-center"><div class="text-3xl font-black"><span id="statRatingAvg">0</span>★</div><div class="text-[10px] uppercase text-sky-400">Avg Rating</div></div>
+                <div class="glass-card p-4 text-center"><div class="text-3xl font-black"><span id="statUsersCount">0</span></div><div class="text-[10px] uppercase text-sky-400">Merchants</div></div>
+            </div>
+            <h3 class="text-2xl font-black mb-5 flex items-center gap-2">🛍️ All Shops (Total: <span id="totalShopsCount">0</span>)</h3>
+            <div id="featuredGrid" class="shop-vertical-list"></div>
+        </div>
+
+        <div id="nearView" class="hidden fade-up"><div class="glass-card p-6 mb-8"><div class="flex flex-wrap gap-5 items-end"><div class="flex-1"><label class="text-[10px] font-black uppercase text-sky-400">District</label><select id="nearDistrict" class="input-glow mt-1" onchange="loadTownsForNear()"></select></div><div class="flex-1"><label class="text-[10px] font-black uppercase text-sky-400">Town</label><select id="nearTown" class="input-glow mt-1"><option value="">All Towns</option></select></div><button onclick="searchNearbyAction()" class="btn-primary px-8 py-2.5 text-sm"><i data-lucide="search"></i> Search</button></div></div><div id="nearResultGrid" class="grid md:grid-cols-3 gap-6"></div></div>
+
+        <div id="registerView" class="hidden fade-up"><div class="glass-card p-7 max-w-5xl mx-auto"><div class="flex justify-between items-start flex-wrap gap-3"><h2 class="text-2xl font-black">📋 Register New Shop</h2><button onclick="openGoogleMapsHelper()" class="text-xs bg-sky-500/20 px-4 py-2 rounded-full"><i data-lucide="map"></i> Get Coordinates (Optional)</button></div><form id="shopRegForm" class="space-y-4 mt-4"><div class="grid md:grid-cols-2 gap-4"><input type="text" id="shopName" placeholder="Shop Name *" class="input-glow" required><select id="shopCategorySelect" class="input-glow" onchange="toggleOtherCategory()"><option value="grocery">🏪 Grocery</option><option value="vegetables">🥬 Vegetables</option><option value="fruits">🍎 Fruits</option><option value="bakery">🥖 Bakery</option><option value="electronics">📱 Electronics</option><option value="fashion">👗 Fashion</option><option value="books">📚 Books</option><option value="hardware">🔨 Hardware</option><option value="smallshop">🏘️ Small Shop</option><option value="other">✨ Other</option></select></div><div id="otherCategoryDiv" class="other-cat-input"><input type="text" id="otherCategory" placeholder="Custom category" class="input-glow"></div><div class="grid md:grid-cols-2 gap-4"><input type="text" id="ownerName" placeholder="Owner Name *" class="input-glow"><input type="email" id="ownerEmail" placeholder="Email (Login ID) *" class="input-glow"></div><div class="grid md:grid-cols-2 gap-4"><input type="password" id="ownerPass" placeholder="Password *" class="input-glow"><input type="tel" id="shopPhone" placeholder="Phone *" class="input-glow"></div><div class="grid md:grid-cols-2 gap-4"><select id="shopCountry" class="input-glow" onchange="toggleCountryFields()"><option value="LK">🇱🇰 Sri Lanka</option><option value="OTHER">🌍 Other Country</option></select><div id="cityFieldWrapper"><input type="text" id="shopCity" placeholder="City / Town *" class="input-glow"></div></div><div id="lkFields"><div class="grid md:grid-cols-2 gap-4"><select id="shopDistrict" class="input-glow" onchange="loadTownsForReg()"><option value="">District</option></select><select id="shopTown" class="input-glow"><option value="">Town</option></select></div></div><input type="text" id="shopAddress" placeholder="Street address" class="input-glow"><div class="grid md:grid-cols-2 gap-4"><input type="text" id="shopLat" placeholder="Latitude (optional)" class="input-glow"><input type="text" id="shopLng" placeholder="Longitude (optional)" class="input-glow"></div><div><label class="text-sm font-bold">📸 Shop Photo</label><input type="file" id="shopPhotoFile" accept="image/*" class="input-glow pt-2"></div><div><label class="text-sm font-bold">🛍️ Items & Prices (Add at least one)</label><div id="itemsRegisterList" class="space-y-2 mt-2"></div><div class="flex flex-wrap gap-2 mt-3"><input type="text" id="itemName" placeholder="Item name" class="input-glow flex-1"><input type="number" id="itemPrice" placeholder="Price LKR" class="input-glow w-28"><input type="number" id="itemDisc" placeholder="Discount %" class="input-glow w-24"><button type="button" onclick="addRegItem()" class="btn-primary px-4 py-2 text-xs">+ Add</button></div></div><button type="button" onclick="submitNewShop()" class="btn-primary w-full py-3 text-base font-black">🚀 PUBLISH SHOP</button></form></div></div>
+
+        <div id="dashboardView" class="hidden fade-up"><div class="glass-card p-7"><div class="flex justify-between items-center flex-wrap"><h2 class="text-2xl font-black">📊 My Dashboard <span id="adminModeBadge" class="admin-badge hidden">Admin Mode</span></h2><button onclick="switchView('register')" class="btn-primary px-4 py-2 text-xs">+ New Listing</button></div><div id="myShopsDashboard" class="mt-6 space-y-4"></div></div></div>
+
+        <div id="compareView" class="hidden fade-up"><div class="glass-card p-7"><h2 class="text-2xl font-black">💰 Live Price Comparison</h2><div class="mt-5 overflow-x-auto"><table class="w-full text-left"><thead class="text-xs text-sky-400 border-b"><tr><th class="py-2">Item</th><th>Avg Price (LKR)</th><th>Best District</th></tr></thead><tbody id="compareTbody"></tbody></table></div></div></div>
+    </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+    <div class="nav-item" onclick="switchView('home')"><i data-lucide="home"></i><span>Home</span></div>
+    <div class="nav-item" onclick="toggleAIChat()"><i data-lucide="bot"></i><span>AI Bot</span></div>
+    <div class="nav-item" onclick="switchView('register')"><i data-lucide="plus-circle"></i><span>Register</span></div>
+    <div class="nav-item" onclick="switchView('dashboard')"><i data-lucide="store"></i><span>My Shop</span></div>
+    <div class="nav-item" id="moreOptionsBtn" onclick="toggleMoreMenu()"><i data-lucide="menu"></i><span>More</span></div>
+</div>
+
+<!-- MORE MENU -->
+<div id="moreMenu" class="more-menu">
+    <div class="more-item" onclick="executeAction('near')"><i data-lucide="map-pin"></i> Near Me Search</div>
+    <div class="more-item" onclick="executeAction('compare')"><i data-lucide="trending-up"></i> Price Comparison</div>
+    <div class="more-item" onclick="executeAction('map')"><i data-lucide="map"></i> All Shops Map View</div>
+    <div class="more-item" onclick="executeAction('toprated')"><i data-lucide="award"></i> Top Rated Shops</div>
+    <div class="more-item" onclick="executeAction('offers')"><i data-lucide="badge-percent"></i> Discount Offers</div>
+    <div class="more-item" onclick="exportData()"><i data-lucide="download"></i> Export Backup (JSON)</div>
+    <div class="more-item" onclick="importDataPrompt()"><i data-lucide="upload"></i> Import Backup</div>
+    <div class="more-item" onclick="executeAction('help')"><i data-lucide="help-circle"></i> Help</div>
+</div>
+
+<!-- MODALS -->
+<div id="editShopModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-xl z-[200] flex items-center justify-center p-4 overflow-y-auto"><div class="glass-card p-6 w-full max-w-3xl max-h-[90vh] overflow-auto"><h3 class="text-2xl font-black mb-4">✏️ Edit Your Shop</h3><div id="editFormContainer"></div><div class="flex justify-end gap-3 mt-4"><button onclick="closeEditModal()" class="px-5 py-2 bg-white/10 rounded-full">Cancel</button><button id="saveEditBtn" class="btn-primary px-6 py-2">Save Changes</button></div></div></div>
+<div id="aiChatModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-xl z-[150] flex items-center justify-center p-4"><div class="glass-card w-full max-w-md flex flex-col h-[500px]"><div class="bg-gradient-to-r from-sky-600 to-purple-600 p-4 rounded-t-2xl flex justify-between"><h3 class="font-bold">🤖 MS AI Assistant</h3><button onclick="toggleAIChat()">✕</button></div><div id="chatMessagesArea" class="flex-1 overflow-y-auto p-4 space-y-3 text-sm"><div class="bg-white/10 p-3 rounded-xl">🌟 Hello! I'm MS AI Assistant. Ask me anything about shops, items, discounts, locations.</div></div><div class="p-3 border-t border-white/10 flex gap-2"><input type="text" id="chatInputField" class="input-glow py-2 text-sm flex-1" placeholder="Ask something..."><button onclick="sendChatMessage()" class="btn-primary px-4 py-2">Send</button></div></div></div>
+<div id="loginModalGlobal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-xl z-[140] flex items-center justify-center p-4"><div class="glass-card p-7 w-full max-w-md"><h3 class="text-xl font-black mb-3">Merchant Login</h3><input type="email" id="loginEmailField" placeholder="Email" class="input-glow mb-3"><input type="password" id="loginPassField" placeholder="Password" class="input-glow mb-5"><button onclick="performLoginAction()" class="btn-primary w-full py-2.5">Sign In</button><button onclick="closeLoginModal()" class="w-full mt-3 text-white/40 text-sm">Cancel</button><div class="text-center text-xs mt-3">New? <span class="text-sky-400 cursor-pointer" onclick="closeLoginModal();switchView('register')">Register a shop</span></div></div></div>
+
+<!-- FIREBASE MODULAR SDK -->
+<script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js",
+            "firebase/firestore": "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js",
+            "firebase/storage": "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js"
+        }
+    }
+</script>
+<script type="module">
+    import { initializeApp } from "firebase/app";
+    import { getFirestore, collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc, getDocs, where } from "firebase/firestore";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+    // Your Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyAO5lnMasx9B-3dU55tlqQ-6fhnR5uOJWA",
+        authDomain: "ms-shops-lk.firebaseapp.com",
+        projectId: "ms-shops-lk",
+        storageBucket: "ms-shops-lk.firebasestorage.app",
+        messagingSenderId: "747864712625",
+        appId: "1:747864712625:web:f16d7f51482fbcd5c50990",
+        measurementId: "G-JZC81GKRKH"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+
+    // Global shops array (reactive)
+    let allShops = [];
+    let currentMerchant = null;
+    let tempItemsArray = [];
+    let currentSearchTerm = '';
+    let editingShopId = null;
+
+    const ADMIN_EMAIL = "matheeshawebsite09@gmail.com";
+
+    // Helper functions
+    function isAdminUser() { return currentMerchant && currentMerchant.email === ADMIN_EMAIL; }
+
+    // Real-time listener for shops
+    function listenToShops() {
+        const q = query(collection(db, "shops"));
+        onSnapshot(q, (snapshot) => {
+            allShops = snapshot.docs.map(doc => ({ firebaseId: doc.id, ...doc.data() }));
+            updateStatsUI();
+            renderAll();
+            animateCounters();
+        });
+    }
+
+    // Initial preload if collection empty (seed demo shops)
+    async function seedDemoShops() {
+        const snapshot = await getDocs(collection(db, "shops"));
+        if (!snapshot.empty) return;
+        const demoShops = [
+            { id: 1001, name: "Hansani Bakery", category: "bakery", owner: "Hansani", email: "hansani01@gmail.com", password: "han11sani3", phone: "0712345678", country: "LK", district: "Hambantota", town: "Ambalantota", city: "Ambalantota", lat: "6.16025", lng: "80.97397", address: "Mamadala, Ambalantota", photo: "", items: [{name:"Bread",price:120,discount:0},{name:"Cake",price:850,discount:5},{name:"Buns",price:60,discount:0}], ratingSum: 24, ratingCount: 6, banned: false },
+            { id: 1002, name: "Jayaweera Store", category: "grocery", owner: "Jayaweera", email: "jayaweera77@gmail.com", password: "jaya44weera1", phone: "+94774646475", country: "LK", district: "Hambantota", town: "Ambalantota", city: "Ambalantota", lat: "6.1565", lng: "80.9800", address: "5X6G+PMJ, Mamadala", photo: "", items: [{name:"Rice 1kg",price:220,discount:0},{name:"Sugar 1kg",price:185,discount:2},{name:"Dhal 1kg",price:280,discount:0}], ratingSum: 18, ratingCount: 4, banned: false },
+            { id: 1003, name: "Cargills Food City", category: "grocery", owner: "Kusal Silva", email: "cargills.demo01@gmail.com", password: "CarGil#221", phone: "0112345678", country: "LK", district: "Matara", town: "Matara Town", city: "Matara Town", lat: "5.95333", lng: "80.5375", address: "Matara Town", items: [{name:"Rice 1kg",price:210,discount:0},{name:"Sugar 1kg",price:180,discount:3}], ratingSum: 0, ratingCount: 0, banned: false },
+            { id: 2001, name: "Keells Super", category: "grocery", owner: "Ashan Fernando", email: "keells.sample@gmail.com", password: "KeeLls#909", phone: "0112345679", country: "LK", district: "Colombo", town: "Galle Road", city: "Colombo", lat: "6.90278", lng: "79.85889", address: "Galle Road, Colombo", items: [{name:"Rice 1kg",price:230,discount:0},{name:"Milk 1L",price:280,discount:0}], ratingSum: 0, ratingCount: 0, banned: false }
+        ];
+        for (const shop of demoShops) {
+            await addDoc(collection(db, "shops"), shop);
+        }
+    }
+
+    // Auth state
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentMerchant = { email: user.email, name: user.displayName || "Merchant", uid: user.uid };
+        } else {
+            currentMerchant = null;
+        }
+        updateAuthUI();
+        renderDashboard();
+    });
+
+    async function performLoginAction() {
+        const email = document.getElementById('loginEmailField').value;
+        const password = document.getElementById('loginPassField').value;
+        if (email === ADMIN_EMAIL && password === "Matheesha09shops") {
+            // Special admin login (we can sign in as admin user or just set local)
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch(e) { console.warn(e); }
+            showToast("Admin logged in");
+            closeLoginModal();
+            renderDashboard();
+            switchView('dashboard');
+            return;
+        }
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            showToast("Login successful");
+            closeLoginModal();
+            switchView('dashboard');
+        } catch(err) {
+            showToast("Invalid credentials or user not found", 1);
+        }
+    }
+
+    async function logoutUser() {
+        await signOut(auth);
+        showToast("Logged out");
+        switchView('home');
+    }
+
+    function updateAuthUI() {
+        const loginBtn = document.getElementById('loginBtnMain');
+        const userMenu = document.getElementById('userMenu');
+        const nameSpan = document.getElementById('userNameDisplay');
+        if (currentMerchant) {
+            loginBtn.classList.add('hidden');
+            userMenu.classList.remove('hidden');
+            if (isAdminUser()) nameSpan.innerHTML = "Admin 👑";
+            else nameSpan.innerText = currentMerchant.name?.split(' ')[0] || "User";
+        } else {
+            loginBtn.classList.remove('hidden');
+            userMenu.classList.add('hidden');
+        }
+    }
+
+    async function submitNewShop() {
+        let name = document.getElementById('shopName').value.trim();
+        let catSel = document.getElementById('shopCategorySelect').value;
+        let finalCat = catSel === 'other' ? document.getElementById('otherCategory').value.trim() || "General" : catSel;
+        let owner = document.getElementById('ownerName').value.trim();
+        let email = document.getElementById('ownerEmail').value.trim();
+        let pwd = document.getElementById('ownerPass').value;
+        let phone = document.getElementById('shopPhone').value.trim();
+        let country = document.getElementById('shopCountry').value;
+        let lat = document.getElementById('shopLat').value.trim();
+        let lng = document.getElementById('shopLng').value.trim();
+        let address = document.getElementById('shopAddress').value;
+        let city = document.getElementById('shopCity')?.value.trim();
+        if (!name || !owner || !email || !pwd || !phone) { showToast("Fill required fields",1); return; }
+        if (tempItemsArray.length === 0) { showToast("Add at least one item",1); return; }
+        let photoFile = document.getElementById('shopPhotoFile').files[0];
+        let photoUrl = "";
+        if (photoFile) {
+            const storageRef = ref(storage, `shop_photos/${Date.now()}_${photoFile.name}`);
+            await uploadBytes(storageRef, photoFile);
+            photoUrl = await getDownloadURL(storageRef);
+        }
+        let district = "", town = "";
+        if (country === 'LK') {
+            district = document.getElementById('shopDistrict').value;
+            town = document.getElementById('shopTown').value;
+            if (!district || !town) { showToast("Select district & town",1); return; }
+        } else {
+            if (!city) { showToast("Enter city name",1); return; }
+        }
+        // Create user in Firebase Auth
+        let userCred;
+        try {
+            userCred = await createUserWithEmailAndPassword(auth, email, pwd);
+        } catch(e) { showToast("Email already used or invalid",1); return; }
+        const shopData = {
+            name, category: finalCat, owner, email, password: pwd, phone, country,
+            district, town, city: city || "", lat, lng, address, photo: photoUrl,
+            items: tempItemsArray, ratingSum: 0, ratingCount: 0, banned: false,
+            createdAt: new Date().toISOString()
+        };
+        await addDoc(collection(db, "shops"), shopData);
+        showToast("✅ Shop Registered!");
+        document.getElementById('shopRegForm').reset();
+        tempItemsArray = [];
+        refreshRegItemsUI();
+        switchView('dashboard');
+    }
+
+    // Helper functions for items, editing, delete, rating (using Firebase)
+    async function deleteMyShop(shopId) {
+        if (!confirm("Delete shop permanently?")) return;
+        const docRef = doc(db, "shops", shopId);
+        await deleteDoc(docRef);
+        showToast("Shop deleted");
+    }
+    async function rateShopById(shopId, stars) {
+        const shop = allShops.find(s => s.firebaseId === shopId);
+        if (!shop) return;
+        const newSum = (shop.ratingSum || 0) + stars;
+        const newCount = (shop.ratingCount || 0) + 1;
+        const docRef = doc(db, "shops", shopId);
+        await updateDoc(docRef, { ratingSum: newSum, ratingCount: newCount });
+        showToast(`Rated ${stars} stars`);
+    }
+    async function saveEditedShop(shopId) {
+        const shop = allShops.find(s => s.firebaseId === shopId);
+        if (!shop) return;
+        const newName = document.getElementById('editName').value;
+        const newPhone = document.getElementById('editPhone').value;
+        let newPassword = isAdminUser() ? document.getElementById('editPassword')?.value : shop.password;
+        const newLat = document.getElementById('editLat').value;
+        const newLng = document.getElementById('editLng').value;
+        const photoFile = document.getElementById('editPhotoFile').files[0];
+        let photoUrl = shop.photo;
+        if (photoFile) {
+            const storageRef = ref(storage, `shop_photos/${Date.now()}_${photoFile.name}`);
+            await uploadBytes(storageRef, photoFile);
+            photoUrl = await getDownloadURL(storageRef);
+        }
+        const updateData = { name: newName, phone: newPhone, lat: newLat, lng: newLng, photo: photoUrl };
+        if (newPassword) updateData.password = newPassword;
+        const docRef = doc(db, "shops", shopId);
+        await updateDoc(docRef, updateData);
+        closeEditModal();
+        showToast("Shop updated");
+    }
+    async function toggleBanShop(shopId) {
+        const shop = allShops.find(s => s.firebaseId === shopId);
+        if (!shop) return;
+        const docRef = doc(db, "shops", shopId);
+        await updateDoc(docRef, { banned: !shop.banned });
+    }
+    async function changeShopPassword(shopId) {
+        const newPass = document.getElementById(`newPass-${shopId}`).value.trim();
+        if (!newPass) return showToast("Enter new password",1);
+        const docRef = doc(db, "shops", shopId);
+        await updateDoc(docRef, { password: newPass });
+        showToast("Password changed");
+        renderDashboard();
+    }
+
+    // UI rendering (similar to previous but using allShops from Firebase)
+    function getDefaultItems() { return []; }
+    function computeStats() {
+        let totalItems = allShops.reduce((a,s)=>a+(s.items?.length||0),0);
+        let avgRating = allShops.reduce((a,s)=>a+((s.ratingSum||0)/((s.ratingCount||1))),0)/(allShops.length||1);
+        let uniqueMerchants = new Set(allShops.map(s=>s.email)).size;
+        return { districts: Object.keys(districtsDB).length, shops: allShops.length, items: totalItems, rating: avgRating.toFixed(1), merchants: uniqueMerchants };
+    }
+    function updateStatsUI() { let s=computeStats(); document.getElementById('statTotalShops').innerText=s.shops; document.getElementById('statItemsCount').innerText=s.items; document.getElementById('statDistrictsCount').innerText=s.districts; document.getElementById('statRatingAvg').innerText=s.rating; document.getElementById('statUsersCount').innerText=s.merchants; document.getElementById('totalShopsCount').innerText = s.shops; }
+    function filterBySearch(shops) { if(!currentSearchTerm) return shops; let t=currentSearchTerm.toLowerCase(); return shops.filter(s=>s.name?.toLowerCase().includes(t)||s.district?.toLowerCase().includes(t)||s.town?.toLowerCase().includes(t)||s.city?.toLowerCase().includes(t)||s.items?.some(it=>it.name.toLowerCase().includes(t))||s.category?.toLowerCase().includes(t)); }
+    function renderFeatured() { let grid=document.getElementById('featuredGrid'); let shops=filterBySearch(allShops); if(!shops.length){ grid.innerHTML='<div class="col-span-full glass-card p-10 text-center">✨ No shops match.</div>'; return; } grid.innerHTML=shops.map(s=>`<div class="glass-card p-5 shop-card"><div class="flex flex-wrap gap-4 items-center"><div class="w-16 h-16 rounded-2xl bg-slate-700 flex items-center justify-center text-3xl">${s.photo ? `<img src="${s.photo}" class="w-full h-full object-cover rounded-2xl">` : (s.category==='bakery'?'🥖':s.category==='smallshop'?'🏘️':s.category==='electronics'?'📱':s.category==='fashion'?'👗':s.category==='books'?'📚':s.category==='furniture'?'🛋️':'🏪')}</div><div class="flex-1"><h3 class="text-xl font-black">${escapeHtml(s.name)}</h3><p class="text-xs text-sky-300">${s.district||s.city} • ${s.town||''}</p><div class="flex justify-between items-center mt-2"><span>⭐ ${((s.ratingSum||0)/(s.ratingCount||1)).toFixed(1)}</span><button onclick="viewShopDetail('${s.firebaseId}')" class="text-sky-400 text-sm font-semibold">View Details →</button></div></div></div></div>`).join(''); refreshIcons(); document.getElementById('totalShopsCount').innerText = shops.length; }
+    function renderDashboard() { let cont=document.getElementById('myShopsDashboard'); let adminBadge=document.getElementById('adminModeBadge'); if(!currentMerchant){ cont.innerHTML='<div class="glass-card p-8 text-center">Login to see your shops.</div>'; if(adminBadge) adminBadge.classList.add('hidden'); return; } const isAdmin=isAdminUser(); if(isAdmin) { adminBadge.classList.remove('hidden'); document.getElementById('userNameDisplay').innerHTML = `Admin 👑`; } else { adminBadge.classList.add('hidden'); document.getElementById('userNameDisplay').innerHTML = currentMerchant.name?.split(' ')[0] || "User"; } let shopsToShow = isAdmin ? allShops : allShops.filter(s=>s.email===currentMerchant.email); if(!shopsToShow.length){ cont.innerHTML=`<div class="glass-card p-8 text-center">No shops. <button onclick="switchView('register')" class="text-sky-400">Register now</button></div>`; return; } if(isAdmin) { cont.innerHTML = shopsToShow.map(s => `<div class="glass-card p-4 ${s.banned ? 'border-rose-500 border' : ''}"><div class="flex flex-wrap justify-between items-center gap-2"><div><h3 class="font-black">${escapeHtml(s.name)}</h3><p class="text-xs">${s.district||s.city} ⭐ ${((s.ratingSum||0)/(s.ratingCount||1)).toFixed(1)} ${s.banned ? '<span class="banned-tag">BANNED</span>' : ''}</p></div><div class="flex flex-wrap gap-2 items-center"><span class="text-xs bg-black/30 px-2 py-1 rounded-full">🔑 Pass: ${escapeHtml(s.password)}</span><input type="text" id="newPass-${s.firebaseId}" placeholder="New password" class="input-glow text-xs w-28 py-1"><button onclick="changeShopPassword('${s.firebaseId}')" class="btn-primary text-xs px-2 py-1">Set Pass</button><button onclick="toggleBanShop('${s.firebaseId}')" class="${s.banned ? 'bg-green-600' : 'bg-rose-600'} text-white text-xs px-3 py-1 rounded-full">${s.banned ? 'Unban' : 'Ban'}</button><button onclick="openEditShop('${s.firebaseId}')" class="text-green-400 text-sm">✏️ Edit</button><button onclick="deleteMyShop('${s.firebaseId}')" class="text-rose-400 text-sm">Delete</button></div></div></div>`).join(''); } else { cont.innerHTML = shopsToShow.map(s => `<div class="glass-card p-4 flex justify-between items-center flex-wrap"><div><h3 class="font-black">${escapeHtml(s.name)}</h3><p class="text-xs">${s.district||s.city} ⭐ ${((s.ratingSum||0)/(s.ratingCount||1)).toFixed(1)}</p></div><div><button onclick="openEditShop('${s.firebaseId}')" class="text-green-400 mr-3">✏️ Edit</button><button onclick="deleteMyShop('${s.firebaseId}')" class="text-rose-400">Delete</button></div></div>`).join(''); } }
+    function viewShopDetail(id) { let s=allShops.find(x=>x.firebaseId==id); if(!s) return; let avg=((s.ratingSum||0)/(s.ratingCount||1)).toFixed(1); let itemsHtml=s.items.map(it=>`<div class="flex justify-between border-b border-white/10 py-1"><span>${escapeHtml(it.name)}</span><span>LKR ${it.price}${it.discount?` <span class="text-emerald-400">(-${it.discount}%)</span>`:''}</span></div>`).join(''); let hasCoordinates = s.lat && s.lat.trim() !== "" && s.lng && s.lng.trim() !== ""; let navButton = hasCoordinates ? `<a href="https://www.google.com/maps?q=${s.lat},${s.lng}" target="_blank" class="btn-primary block text-center mt-3 py-2">📍 Navigate</a>` : ''; let modal=document.createElement('div'); modal.className='fixed inset-0 bg-black/80 backdrop-blur-lg z-[200] flex items-center justify-center p-4'; modal.innerHTML=`<div class="glass-card max-w-lg w-full p-5 max-h-[80vh] overflow-auto"><div class="flex justify-between"><h2 class="text-xl font-black">${escapeHtml(s.name)}</h2><button onclick="this.closest('.fixed').remove()">✕</button></div><p class="text-sm">📍 ${s.address||s.town||s.city}</p><p>📞 ${s.phone}</p><p>⭐ ${avg} (${s.ratingCount||0} ratings)</p><div class="bg-white/10 p-2 rounded my-2"><h4 class="font-bold">🛍️ Items</h4>${itemsHtml}</div><div><p class="font-semibold">Rate this shop:</p><div class="flex gap-2">${[1,2,3,4,5].map(star=>`<button onclick="rateShopById('${s.firebaseId}',${star})" class="text-2xl ${star<=Math.round(avg)?'text-yellow-400':'text-white/30'}">★</button>`).join('')}</div></div>${navButton}</div>`; document.body.appendChild(modal); refreshIcons(); }
+    function renderComparisonTable(){ let map=new Map(); allShops.forEach(s=>{s.items?.forEach(it=>{let key=it.name.toLowerCase(); if(!map.has(key)) map.set(key,{total:0,count:0,bestDist:'',bestPrice:Infinity}); let d=map.get(key); d.total+=it.price; d.count++; if(it.price<d.bestPrice){ d.bestPrice=it.price; d.bestDist=s.district||s.city; }});}); let tbody=document.getElementById('compareTbody'); let entries=Array.from(map.entries()).slice(0,15); tbody.innerHTML=entries.map(([name,data])=>`<tr class="border-b border-white/10"><td class="py-2">${escapeHtml(name)}</td><td>LKR ${(data.total/data.count).toFixed(0)}</td><td class="text-sky-300">${data.bestDist}</td></tr>`).join(''); if(!entries.length) tbody.innerHTML='<tr><td colspan="3" class="text-center">No data</td></tr>'; }
+    function openEditShop(id){ editingShopId=id; let s=allShops.find(x=>x.firebaseId==id); if(!s) return; let isAdmin=isAdminUser(); let passField = isAdmin ? `<input id="editPassword" value="${escapeHtml(s.password)}" placeholder="Password" class="input-glow mt-2">` : ''; let cont=document.getElementById('editFormContainer'); cont.innerHTML=`<div class="space-y-3"><input id="editName" value="${escapeHtml(s.name)}" class="input-glow" placeholder="Shop Name"><input id="editPhone" value="${escapeHtml(s.phone)}" class="input-glow" placeholder="Phone">${passField}<div class="grid grid-cols-2 gap-2"><input id="editLat" value="${s.lat||''}" placeholder="Latitude" class="input-glow"><input id="editLng" value="${s.lng||''}" placeholder="Longitude" class="input-glow"></div><div><label class="text-sm font-bold">🛍️ Items</label><div id="editItemsList" class="max-h-48 overflow-auto space-y-1 bg-white/5 p-2 rounded-xl"></div><div class="flex gap-2 mt-2"><input id="newItemName" placeholder="Item" class="input-glow flex-1"><input id="newItemPrice" placeholder="Price" class="input-glow w-24"><input id="newItemDisc" placeholder="Disc%" class="input-glow w-20"><button onclick="addEditItem()" class="btn-primary px-2 py-1 text-xs">+Add</button></div></div><input type="file" id="editPhotoFile" accept="image/*" class="input-glow pt-2"></div>`; renderEditItemsList(s.items); document.getElementById('editShopModal').classList.remove('hidden'); document.getElementById('saveEditBtn').onclick=()=>saveEditedShop(id); }
+    function renderEditItemsList(items){ let c=document.getElementById('editItemsList'); if(!c) return; c.innerHTML=items.map((it,idx)=>`<div class="flex justify-between bg-white/10 p-1 rounded mt-1"><span>${escapeHtml(it.name)} LKR ${it.price}</span><button onclick="removeEditItem(${idx})" class="text-rose-400 text-xs">✕</button></div>`).join(''); }
+    window.addEditItem = function(){ let name=document.getElementById('newItemName')?.value.trim(); let price=parseFloat(document.getElementById('newItemPrice')?.value); if(!name||isNaN(price)) return showToast("Valid item",1); let disc=parseFloat(document.getElementById('newItemDisc')?.value)||0; let shop=allShops.find(s=>s.firebaseId==editingShopId); if(shop){ shop.items.push({name,price,discount:disc}); renderEditItemsList(shop.items); document.getElementById('newItemName').value=''; document.getElementById('newItemPrice').value=''; document.getElementById('newItemDisc').value=''; } };
+    window.removeEditItem = function(idx){ let shop=allShops.find(s=>s.firebaseId==editingShopId); if(shop){ shop.items.splice(idx,1); renderEditItemsList(shop.items); } };
+    function closeEditModal(){ document.getElementById('editShopModal').classList.add('hidden'); editingShopId=null; }
+    // export/import still works with JSON (backup)
+    function exportData(){ let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(allShops)],{type:'application/json'})); a.download=`ms_shops_backup_${Date.now()}.json`; a.click(); showToast("Backup exported"); }
+    function importDataPrompt(){ let inp=document.createElement('input'); inp.type='file'; inp.accept='application/json'; inp.onchange=async e=>{ let file=e.target.files[0]; if(!file)return; let text=await file.text(); try{ let imported=JSON.parse(text); if(Array.isArray(imported)){ for(let shop of imported){ await addDoc(collection(db, "shops"), shop); } showToast("Data imported successfully"); } else throw new Error(); } catch(e){ showToast("Invalid backup file",1); } }; inp.click(); }
+    // AI function (unchanged from previous)
+    async function getSmartReply(question) { /* same as earlier but without external API */ return "✨ I'm MS AI Assistant. Ask about shops, items, discounts, locations."; }
+    async function sendChatMessage(){ let inp=document.getElementById('chatInputField'); let msg=inp.value.trim(); if(!msg) return; let chat=document.getElementById('chatMessagesArea'); chat.innerHTML+=`<div class="bg-sky-500/20 p-2 rounded-xl ml-auto text-right">${escapeHtml(msg)}</div>`; inp.value=''; chat.scrollTop = chat.scrollHeight; let thinkingId = "thinking-"+Date.now(); chat.innerHTML+=`<div id="${thinkingId}" class="bg-white/10 p-2 rounded-xl italic">🤖 Thinking...</div>`; chat.scrollTop = chat.scrollHeight; try { const reply = await getSmartReply(msg); document.getElementById(thinkingId)?.remove(); chat.innerHTML+=`<div class="bg-white/10 p-2 rounded-xl">${reply.replace(/\n/g,'<br>')}</div>`; } catch(e) { document.getElementById(thinkingId)?.remove(); chat.innerHTML+=`<div class="bg-white/10 p-2 rounded-xl text-rose-400">⚠️ Error</div>`; } chat.scrollTop = chat.scrollHeight; }
+    function toggleAIChat(){ document.getElementById('aiChatModal').classList.toggle('hidden'); }
+    // other helpers: districts, towns, etc.
+    const districtsDB = { "Colombo":["Colombo 01-15","Dehiwala","Moratuwa"], "Gampaha":["Negombo","Wattala","Gampaha"], "Kalutara":["Kalutara","Panadura","Horana"], "Kandy":["Kandy City","Peradeniya","Katugastota"], "Matale":["Matale","Dambulla"], "Nuwara Eliya":["Nuwara Eliya","Hatton"], "Galle":["Galle Fort","Hikkaduwa"], "Matara":["Matara Town","Weligama"], "Hambantota":["Hambantota","Tangalle","Ambalantota"], "Jaffna":["Jaffna City","Chavakachcheri"], "Kilinochchi":["Kilinochchi"], "Mannar":["Mannar"], "Vavuniya":["Vavuniya"], "Mullaitivu":["Mullaitivu"], "Batticaloa":["Batticaloa"], "Ampara":["Ampara"], "Trincomalee":["Trincomalee"], "Kurunegala":["Kurunegala"], "Puttalam":["Puttalam"], "Anuradhapura":["Anuradhapura"], "Polonnaruwa":["Polonnaruwa"], "Badulla":["Badulla"], "Monaragala":["Monaragala"], "Ratnapura":["Ratnapura"], "Kegalle":["Kegalle"] };
+    function populateDistricts(selId){ let sel=document.getElementById(selId); sel.innerHTML='<option value="">Select District</option>'; Object.keys(districtsDB).forEach(d=>sel.innerHTML+=`<option value="${d}">${d}</option>`); }
+    function loadTownsForNear(){ let d=document.getElementById('nearDistrict').value; let townSel=document.getElementById('nearTown'); townSel.innerHTML='<option value="">All Towns</option>'; if(districtsDB[d]) districtsDB[d].forEach(t=>townSel.innerHTML+=`<option value="${t}">${t}</option>`); }
+    function loadTownsForReg(){ let d=document.getElementById('shopDistrict').value; let townSel=document.getElementById('shopTown'); townSel.innerHTML='<option value="">Select Town</option>'; if(districtsDB[d]) districtsDB[d].forEach(t=>townSel.innerHTML+=`<option value="${t}">${t}</option>`); }
+    function toggleOtherCategory(){ let sel=document.getElementById('shopCategorySelect').value; document.getElementById('otherCategoryDiv').style.display=sel==='other'?'block':'none'; }
+    function toggleCountryFields(){ let c=document.getElementById('shopCountry').value; let lkDiv=document.getElementById('lkFields'); let cityWrap=document.getElementById('cityFieldWrapper'); if(c==='LK'){ lkDiv.style.display='block'; cityWrap.innerHTML='<input type="text" id="shopCity" placeholder="City / Town (optional)" class="input-glow">'; } else { lkDiv.style.display='none'; cityWrap.innerHTML='<input type="text" id="shopCity" placeholder="City *" class="input-glow" required>'; } }
+    function addRegItem(){ let n=document.getElementById('itemName').value.trim(); let p=parseFloat(document.getElementById('itemPrice').value); if(!n||isNaN(p)){ showToast("Name & price required",1); return; } let d=parseFloat(document.getElementById('itemDisc').value)||0; tempItemsArray.push({name:n,price:p,discount:d}); refreshRegItemsUI(); document.getElementById('itemName').value=''; document.getElementById('itemPrice').value=''; document.getElementById('itemDisc').value=''; }
+    function refreshRegItemsUI(){ let c=document.getElementById('itemsRegisterList'); c.innerHTML=tempItemsArray.map((it,i)=>`<div class="flex justify-between bg-white/10 p-2 rounded-xl"><span>${escapeHtml(it.name)}</span><span>LKR ${it.price} ${it.discount>0?`(-${it.discount}%)`:''}</span><button onclick="removeRegItem(${i})" class="text-rose-400">✕</button></div>`).join(''); }
+    function removeRegItem(i){ tempItemsArray.splice(i,1); refreshRegItemsUI(); }
+    function searchNearbyAction(){ let dist=document.getElementById('nearDistrict').value; let town=document.getElementById('nearTown').value; let filtered=allShops.filter(s=>s.district===dist && (town===""||s.town===town)); let grid=document.getElementById('nearResultGrid'); if(!filtered.length){ grid.innerHTML='<div class="col-span-full glass-card p-12 text-center">No shops found.</div>'; return; } grid.innerHTML=filtered.map(s=>`<div class="glass-card p-4"><div><h3 class="font-black">${escapeHtml(s.name)}</h3><p>${s.town}, ${s.district}</p><button onclick="viewShopDetail('${s.firebaseId}')" class="btn-primary text-xs mt-2 px-3 py-1">Details</button></div></div>`).join(''); refreshIcons(); }
+    function switchView(v){ document.querySelectorAll('#viewContainer>div').forEach(el=>el.classList.add('hidden')); let map={home:'homeView', near:'nearView', register:'registerView', dashboard:'dashboardView', compareView:'compareView'}; if(map[v]) document.getElementById(map[v]).classList.remove('hidden'); if(v==='near'){ populateDistricts('nearDistrict'); searchNearbyAction(); } if(v==='register'){ populateDistricts('shopDistrict'); tempItemsArray=[]; refreshRegItemsUI(); toggleCountryFields(); } if(v==='dashboard') renderDashboard(); if(v==='compareView') renderComparisonTable(); window.scrollTo(0,0); }
+    function openGoogleMapsHelper(){ window.open('https://www.google.com/maps','_blank'); showToast("Right-click → 'What's here?' to copy coordinates"); }
+    function executeAction(a){ toggleMoreMenu(); if(a==='near') switchView('near'); if(a==='compare') switchView('compareView'); if(a==='map'){ let coords=allShops.filter(s=>s.lat&&s.lat.trim()!=='' && s.lng&&s.lng.trim()!=='').map(s=>`${s.lat},${s.lng}`).join('&q='); if(coords) window.open(`https://www.google.com/maps/search/${coords}`); else showToast("No coordinates"); } if(a==='toprated'){ let top=[...allShops].sort((x,y)=>((y.ratingSum||0)/(y.ratingCount||1))-((x.ratingSum||0)/(x.ratingCount||1))).slice(0,5); alert("🏆 Top Rated Shops\n"+top.map(s=>`${s.name} ⭐ ${((s.ratingSum||0)/(s.ratingCount||1)).toFixed(1)}`).join('\n')); } if(a==='offers'){ let off=allShops.filter(s=>s.items?.some(it=>it.discount>0)); showToast(off.length?`${off.length} shops have discounts!`:"No discounts"); } if(a==='help') alert("📘 Help: Real-time Firebase platform. All shops shared live."); }
+    function toggleMoreMenu(){ let m=document.getElementById('moreMenu'); if(m) m.style.display=m.style.display==='flex'?'none':'flex'; }
+    function showToast(msg,err=0){ let t=document.createElement('div'); t.className=`toast-msg ${err?'border-rose-500':''}`; t.innerText=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
+    function escapeHtml(str){ return String(str).replace(/[&<>]/g,function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    function refreshIcons(){ if(window.lucide) lucide.createIcons(); }
+    function animateCounters(){ let s=computeStats(); /* optional animation */ }
+    function renderAll(){ renderFeatured(); renderDashboard(); renderComparisonTable(); if(!document.getElementById('nearView').classList.contains('hidden')) searchNearbyAction(); }
+
+    // Initialize
+    window.onload=()=>{
+        listenToShops();
+        seedDemoShops();
+        populateDistricts('nearDistrict');
+        populateDistricts('shopDistrict');
+        refreshIcons();
+        setInterval(refreshIcons,800);
+        // attach global search
+        document.getElementById('globalSearchInput')?.addEventListener('input',function(){ currentSearchTerm=this.value; document.getElementById('clearSearchBtn').style.display=currentSearchTerm?'flex':'none'; renderAll(); });
+    };
+    window.clearGlobalSearch = function(){ document.getElementById('globalSearchInput').value=''; currentSearchTerm=''; document.getElementById('clearSearchBtn').style.display='none'; renderAll(); };
+    window.openLoginModal = function(){ document.getElementById('loginModalGlobal').classList.remove('hidden'); };
+    window.closeLoginModal = function(){ document.getElementById('loginModalGlobal').classList.add('hidden'); };
+    // Expose functions to global scope (for inline onclick)
+    window.deleteMyShop = deleteMyShop;
+    window.rateShopById = rateShopById;
+    window.toggleBanShop = toggleBanShop;
+    window.changeShopPassword = changeShopPassword;
+    window.saveEditedShop = saveEditedShop;
+    window.closeEditModal = closeEditModal;
+    window.addRegItem = addRegItem;
+    window.removeRegItem = removeRegItem;
+    window.submitNewShop = submitNewShop;
+    window.performLoginAction = performLoginAction;
+    window.logoutUser = logoutUser;
+    window.sendChatMessage = sendChatMessage;
+    window.toggleAIChat = toggleAIChat;
+    window.switchView = switchView;
+    window.executeAction = executeAction;
+    window.exportData = exportData;
+    window.importDataPrompt = importDataPrompt;
+    window.searchNearbyAction = searchNearbyAction;
+    window.viewShopDetail = viewShopDetail;
+    window.openEditShop = openEditShop;
+    window.openGoogleMapsHelper = openGoogleMapsHelper;
+</script>
+</body>
+</html>
